@@ -12,16 +12,26 @@
   modified 8 May 2014
   by Scott Fitzgerald
   modified 13 july 2016.
+  By Dave bemelmans
  */
+ #include <NeoPixelBus.h>
+
+const uint16_t PixelCount = 60;
+const uint8_t PixelPin = 10;
+ 
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
+int red, green, blue = 0;
 
-int LEDpin = 10;
+// three element pixels, in different order and speeds
+NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   // initialize digital pin 13 as an output.
-  pinMode(10, OUTPUT);
-  Serial.begin(19200);
+  Serial.begin(115200);
+  strip.Begin();
+  strip.Show();
 }
 
 // the loop function runs over and over again forever
@@ -29,12 +39,51 @@ void loop() {
   serialEvent();
   if(stringComplete){
     Serial.println(inputString);
-    if(inputString == "ON\n"){
-      digitalWrite(LEDpin, HIGH);   // turn the LED on (HIGH is the voltage level)
+    //all code here
+    char charArray[30];
+   
+    int k = 0;
+    int L = 0;
+    for(int i = 0; i< inputString.length();i++){
+      if(inputString[i] != ',' && inputString[i] !='\n')
+      {
+        charArray[k] = inputString[i];
+        k++;
+        Serial.print(charArray);
+        Serial.print(" : ");
+        Serial.println(L);
       }
-     if(inputString == "OFF\n"){
-       digitalWrite(LEDpin, LOW);    // turn the LED off by making the voltage LOW
+      else{
+        switch(L){
+          case 0:
+            red = atoi(charArray);
+             L = 1;
+            break;
+          case 1:
+            green = atoi(charArray);
+             L = 2;
+            break;
+          case 2:
+            blue = atoi(charArray);
+            break;
+        }     
+        k =0;
+       for(int i = 0; i<sizeof(charArray); i++){
+        charArray[i] = (char)0;
+       }
       }
+    }
+    RgbColor color(red, green, blue);
+    for(int i = 0; i <= PixelCount; i++){
+      strip.SetPixelColor(i,color);
+      
+    }
+    strip.Show();
+    Serial.println(red);
+    Serial.println(green);
+    Serial.println(blue);
+
+    //******
     inputString = "";
     stringComplete = false;
     }
