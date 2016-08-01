@@ -34,12 +34,6 @@ class serialConnect:
         self.myserial.write(data_bytes)
         print('send data: ', data_bytes)
 
-    def data_check(self,data):
-        # check if the data has been received correctly.
-        #startbyte < and end byte >
-        for i in data:
-            if i == '<':
-
 
 class socketServer:
     host = ''
@@ -87,7 +81,7 @@ class socketServer:
         data = self.data_queue.get()
         return data
 
-    #data checking fuction
+    #Check received data.
     def data_check(self, input_data):
         #data must be in this form <,1,2,3,4,> anything else is wrong.
         #if correct data has been found, it wil be returned as a string, else it returns False
@@ -137,8 +131,7 @@ def Main():
         arduino_conn.serial_write(data_received)
         arduino_conn.serial_stop()
         print('-------------------------------- \n')
-        #Features needed to be added
-        #begin and end of message byte.
+        #Features to be added
         #Dilluting blue color between set times.
 
 
